@@ -37,9 +37,15 @@ module.exports = class Service {
     this.modes = this.plugins.reduce((modes, { apply: { defaultModes }}) => {
       return Object.assign(modes, defaultModes)
     }, {})
+
+      console.log('constructed');
+
   }
 
   resolvePkg (inlinePkg, context = this.context) {
+
+      console.log('resolve pkg');
+
     if (inlinePkg) {
       return inlinePkg
     } else if (fs.existsSync(path.join(context, 'package.json'))) {
@@ -55,6 +61,9 @@ module.exports = class Service {
   }
 
   init (mode = process.env.VUE_CLI_MODE) {
+
+      console.log('init');
+
     if (this.initialized) {
       return
     }
@@ -86,9 +95,15 @@ module.exports = class Service {
     if (this.projectOptions.configureWebpack) {
       this.webpackRawConfigFns.push(this.projectOptions.configureWebpack)
     }
+
+      console.log('inited');
+
   }
 
   loadEnv (mode) {
+
+      console.log('load env');
+
     const logger = debug('vue:env')
     const basePath = path.resolve(this.context, `.env${mode ? `.${mode}` : ``}`)
     const localPath = `${basePath}.local`
@@ -128,9 +143,15 @@ module.exports = class Service {
         process.env.BABEL_ENV = defaultNodeEnv
       }
     }
+
+      console.log('loaded env');
+
   }
 
   resolvePlugins (inlinePlugins, useBuiltIn) {
+
+      console.log('resolve plug');
+
     const idToPlugin = id => ({
       id: id.replace(/^.\//, 'built-in:'),
       apply: require(id)
@@ -175,10 +196,15 @@ module.exports = class Service {
       })))
     }
 
+      console.log('resolved plug');
+
     return plugins
   }
 
   async run (name, args = {}, rawArgv = []) {
+
+      console.log('run');
+
     // resolve mode
     // prioritize inline --mode
     // fallback to resolved default modes from plugins or development if --watch is defined
@@ -200,17 +226,29 @@ module.exports = class Service {
       rawArgv.shift()
     }
     const { fn } = command
+
+      console.log('runned');
+
     return fn(args, rawArgv)
   }
 
   resolveChainableWebpackConfig () {
+
+      console.log('resolve chainable config');
+
     const chainableConfig = new Config()
     // apply chains
     this.webpackChainFns.forEach(fn => fn(chainableConfig))
+
+      console.log('resolved chainable config');
+
     return chainableConfig
   }
 
   resolveWebpackConfig (chainableConfig = this.resolveChainableWebpackConfig()) {
+
+      console.log('resolve wp config');
+
     if (!this.initialized) {
       throw new Error('Service must call init() before calling resolveWebpackConfig().')
     }
@@ -251,6 +289,8 @@ module.exports = class Service {
         `Use the "baseUrl" option in vue.config.js instead.`
       )
     }
+
+      console.log('resolved wp config');
 
     return config
   }
